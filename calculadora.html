@@ -1,0 +1,377 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Calculadora de Compra Inteligente</title>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;600&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --primary-color: #007BFF;
+            --secondary-color: #5A67D8;
+            --bg-color: #f0f4f8;
+            --card-bg: #ffffff;
+            --text-color: #333;
+            --light-text: #666;
+            --success-color: #28a745;
+            --error-color: #dc3545;
+            --border-color: #e2e8f0;
+            --shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+        }
+
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: 'Poppins', sans-serif;
+            display: flex;
+            flex-direction: column;
+            justify-content: center;
+            align-items: center;
+            min-height: 100vh;
+            background-color: var(--bg-color);
+            padding: 20px;
+        }
+
+        .container {
+            background-color: var(--card-bg);
+            padding: 40px;
+            border-radius: 12px;
+            box-shadow: var(--shadow);
+            max-width: 550px;
+            width: 100%;
+            transition: all 0.3s ease;
+        }
+
+        h1 {
+            text-align: center;
+            color: var(--primary-color);
+            margin-bottom: 10px;
+            font-size: 1.8em;
+        }
+
+        p.description {
+            color: var(--light-text);
+            text-align: center;
+            margin-bottom: 30px;
+            line-height: 1.6;
+        }
+
+        .form-group {
+            margin-bottom: 20px;
+        }
+
+        .form-group label {
+            display: block;
+            margin-bottom: 8px;
+            font-weight: 600;
+            color: var(--text-color);
+        }
+        
+        .form-group input[type="number"] {
+            width: 100%;
+            padding: 12px;
+            border: 1px solid var(--border-color);
+            border-radius: 8px;
+            font-size: 1em;
+            transition: border-color 0.3s ease;
+        }
+
+        .form-group input[type="number"]:focus {
+            border-color: var(--secondary-color);
+            outline: none;
+            box-shadow: 0 0 0 2px rgba(90, 103, 216, 0.2);
+        }
+        
+        .radio-group {
+            display: flex;
+            gap: 20px;
+            margin-top: 10px;
+        }
+
+        .radio-group input[type="radio"] {
+            display: none;
+        }
+
+        .radio-group label {
+            background-color: var(--bg-color);
+            color: var(--light-text);
+            padding: 10px 15px;
+            border-radius: 8px;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            font-weight: 400;
+            text-align: center;
+            flex: 1;
+        }
+
+        .radio-group input[type="radio"]:checked + label {
+            background-color: var(--primary-color);
+            color: #fff;
+            font-weight: 600;
+            box-shadow: 0 2px 8px rgba(0, 0, 0, 0.1);
+        }
+
+        button {
+            width: 100%;
+            padding: 15px;
+            background-color: var(--primary-color);
+            color: #fff;
+            border: none;
+            border-radius: 8px;
+            font-size: 1.1em;
+            font-weight: 600;
+            cursor: pointer;
+            transition: background-color 0.3s ease;
+        }
+
+        button:hover {
+            background-color: #0056b3;
+        }
+
+        #resultado {
+            margin-top: 30px;
+            padding: 20px;
+            border-radius: 8px;
+            line-height: 1.6;
+            font-size: 0.95em;
+            border-left: 5px solid;
+        }
+
+        #resultado hr {
+            border: 0;
+            height: 1px;
+            background: var(--border-color);
+            margin: 15px 0;
+        }
+        
+        .resultado-positivo {
+            border-color: var(--success-color);
+            background-color: #e6f9ea;
+        }
+        
+        .resultado-positivo p strong span {
+            color: var(--success-color);
+        }
+
+        .resultado-aviso {
+            border-color: var(--secondary-color);
+            background-color: #eaf1fb;
+        }
+        
+        .developer-credit {
+            margin-top: 25px;
+            font-size: 0.85em;
+            color: var(--light-text);
+            text-align: center;
+        }
+        
+        .hidden {
+            display: none;
+        }
+    </style>
+</head>
+<body>
+
+<div class="container">
+    <h1>Calculadora de Compra</h1>
+    <p class="description">
+        Compare se vale mais a pena pagar à vista ou parcelado.
+    </p>
+
+    <div id="questionario-inicial">
+        <div class="form-group">
+            <label>Você vai conseguir deixar o dinheiro guardado para pagar as parcelas?</label>
+            <div class="radio-group">
+                <input type="radio" id="respostaSim" name="guardaDinheiro" value="sim">
+                <label for="respostaSim">Sim</label>
+                <input type="radio" id="respostaNao" name="guardaDinheiro" value="nao">
+                <label for="respostaNao">Não</label>
+            </div>
+        </div>
+        <button onclick="proximaEtapa()">Continuar</button>
+    </div>
+
+    <div id="calculadora-completa" class="hidden">
+        <div class="form-group">
+            <label for="precoAVista">Preço à Vista (com desconto):</label>
+            <input type="number" id="precoAVista" placeholder="Ex: 900" step="0.01">
+        </div>
+        <div class="form-group">
+            <label for="precoParcelado">Preço Parcelado (sem juros):</label>
+            <input type="number" id="precoParcelado" placeholder="Ex: 1000" step="0.01">
+        </div>
+        <div class="form-group">
+            <label for="parcelas">Número de Parcelas:</label>
+            <input type="number" id="parcelas" placeholder="Ex: 10">
+        </div>
+        <div class="form-group">
+            <label for="taxaSelic">Taxa SELIC Anual (%):</label>
+            <input type="number" id="taxaSelic" placeholder="Ex: 10.5">
+        </div>
+        <div class="form-group">
+            <label>Tipo de Investimento:</label>
+            <div class="radio-group">
+                <input type="radio" id="investimentoCDB" name="tipoInvestimento" value="CDB" checked>
+                <label for="investimentoCDB">CDB</label>
+                <input type="radio" id="investimentoLCI" name="tipoInvestimento" value="LCI_LCA">
+                <label for="investimentoLCI">LCI/LCA (Isento de IR)</label>
+            </div>
+        </div>
+        <div class="form-group">
+            <label for="rendimentoCDB">Rendimento (% do CDI):</label>
+            <input type="number" id="rendimentoCDB" placeholder="Ex: 100 para 100% do CDI">
+        </div>
+        <button onclick="calcular()">Calcular</button>
+    </div>
+
+    <div id="resultado">
+        <p>Preencha os campos acima para ver o resultado.</p>
+    </div>
+</div>
+
+<p class="developer-credit">Desenvolvido por Thadeu Rodrigues</p>
+
+<script>
+    function proximaEtapa() {
+        const resposta = document.querySelector('input[name="guardaDinheiro"]:checked');
+        const questionarioDiv = document.getElementById('questionario-inicial');
+        const calculadoraDiv = document.getElementById('calculadora-completa');
+        const resultadoDiv = document.getElementById('resultado');
+
+        if (!resposta) {
+            alert('Por favor, selecione uma opção (Sim ou Não) para continuar.');
+            return;
+        }
+
+        if (resposta.value === 'nao') {
+            questionarioDiv.classList.add('hidden');
+            calculadoraDiv.classList.add('hidden');
+            resultadoDiv.className = 'resultado-aviso';
+            resultadoDiv.innerHTML = `
+                <p><strong>A melhor opção é pagar à vista.</strong></p>
+                <p>Se você não consegue deixar o dinheiro guardado para as parcelas, o desconto obtido no pagamento à vista é uma economia garantida, sem o risco de se endividar.</p>
+            `;
+        } else {
+            questionarioDiv.classList.add('hidden');
+            calculadoraDiv.classList.remove('hidden');
+            resultadoDiv.innerHTML = "<p>Preencha os campos acima para ver o resultado.</p>";
+            resultadoDiv.className = "";
+        }
+    }
+
+    function calcular() {
+        const precoAVista = parseFloat(document.getElementById('precoAVista').value);
+        const precoParcelado = parseFloat(document.getElementById('precoParcelado').value);
+        const numParcelas = parseInt(document.getElementById('parcelas').value);
+        const taxaSelicAnual = parseFloat(document.getElementById('taxaSelic').value);
+        const rendimentoCDB = parseFloat(document.getElementById('rendimentoCDB').value);
+        const tipoInvestimento = document.querySelector('input[name="tipoInvestimento"]:checked').value;
+        const resultadoDiv = document.getElementById('resultado');
+
+        if (isNaN(precoAVista) || isNaN(precoParcelado) || isNaN(numParcelas) || isNaN(taxaSelicAnual) || precoParcelado <= 0) {
+            resultadoDiv.innerHTML = "<p>Por favor, preencha todos os campos corretamente.</p>";
+            resultadoDiv.className = "";
+            return;
+        }
+
+        let taxaCDIAnual = taxaSelicAnual;
+        if (!isNaN(rendimentoCDB)) {
+            taxaCDIAnual = taxaSelicAnual * (rendimentoCDB / 100);
+        }
+        
+        const taxaCDIMensal = Math.pow(1 + (taxaCDIAnual / 100), 1/12) - 1;
+
+        let aliquotaIR;
+        if (tipoInvestimento === 'LCI_LCA') {
+            aliquotaIR = 0;
+        } else {
+            if (numParcelas <= 6) {
+                aliquotaIR = 22.5;
+            } else if (numParcelas <= 12) {
+                aliquotaIR = 20;
+            } else if (numParcelas <= 24) {
+                aliquotaIR = 17.5;
+            } else {
+                aliquotaIR = 15;
+            }
+        }
+        
+        const economiaAVista = precoParcelado - precoAVista;
+        let valorFinalAVista = economiaAVista;
+
+        if (economiaAVista <= 0) {
+             valorFinalAVista = 0;
+        } else {
+            for (let i = 0; i < numParcelas; i++) {
+                valorFinalAVista += valorFinalAVista * taxaCDIMensal;
+            }
+            const rendimentoBruto = valorFinalAVista - economiaAVista;
+            valorFinalAVista -= rendimentoBruto * (aliquotaIR / 100);
+        }
+
+        const valorParcela = precoParcelado / numParcelas;
+        let saldoInvestido = precoAVista;
+        let rendimentoAcumuladoBruto = 0;
+
+        for (let i = 0; i < numParcelas; i++) {
+            const rendimentoMensalBruto = saldoInvestido * taxaCDIMensal;
+            rendimentoAcumuladoBruto += rendimentoMensalBruto;
+            saldoInvestido += rendimentoMensalBruto;
+            saldoInvestido -= valorParcela;
+        }
+
+        const impostoDeRenda = rendimentoAcumuladoBruto * (aliquotaIR / 100);
+        const valorFinalParcelado = saldoInvestido - impostoDeRenda;
+
+        let mensagem = "";
+        let diferenca = valorFinalAVista - valorFinalParcelado;
+
+        if (diferenca > 0) {
+            mensagem = `
+                <p><strong>Com base nos seus dados, a melhor opção é <span style="color: var(--success-color);">PAGAR À VISTA!</span></strong></p>
+                <hr>
+                <p><strong>Cenário À Vista:</strong> Você teria um saldo final de <strong>R$ ${valorFinalAVista.toFixed(2)}</strong>.</p>
+                <p><strong>Cenário Parcelado:</strong> Você teria um saldo final de <strong>R$ ${valorFinalParcelado.toFixed(2)}</strong>.</p>
+                <hr>
+                <p>Ao escolher pagar à vista, você economiza <strong>R$ ${diferenca.toFixed(2)}</strong>.</p>
+            `;
+            resultadoDiv.className = "resultado-positivo";
+        } else {
+            diferenca = Math.abs(diferenca);
+            mensagem = `
+                <p><strong>Com base nos seus dados, a melhor opção é <span style="color: var(--success-color);">PAGAR PARCELADO!</span></strong></p>
+                <hr>
+                <p><strong>Cenário À Vista:</strong> Você teria um saldo final de <strong>R$ ${valorFinalAVista.toFixed(2)}</strong>.</p>
+                <p><strong>Cenário Parcelado:</strong> Você teria um saldo final de <strong>R$ ${valorFinalParcelado.toFixed(2)}</strong>.</p>
+                <hr>
+                <p>Ao escolher parcelar, você economiza <strong>R$ ${diferenca.toFixed(2)}</strong>.</p>
+            `;
+            resultadoDiv.className = "resultado-positivo";
+        }
+
+        if (valorFinalParcelado < 0) {
+            const gastoExtra = Math.abs(valorFinalParcelado);
+            diferenca = Math.abs(valorFinalAVista - valorFinalParcelado);
+            mensagem = `
+                <p><strong>Com base nos seus dados, a melhor opção é <span style="color: var(--success-color);">PAGAR À VISTA!</span></strong></p>
+                <hr>
+                <p><strong>Cenário À Vista:</strong> Você teria um saldo final de <strong>R$ ${valorFinalAVista.toFixed(2)}</strong>.</p>
+                <p><strong>Cenário Parcelado:</strong> Para pagar, você usaria todo o seu dinheiro guardado e ainda precisaria de mais <strong>R$ ${gastoExtra.toFixed(2)}</strong>.</p>
+                <hr>
+                <p>Ao escolher pagar à vista, você economiza <strong>R$ ${diferenca.toFixed(2)}</strong>.</p>
+            `;
+            resultadoDiv.className = "resultado-positivo";
+        }
+
+        resultadoDiv.innerHTML = mensagem;
+    }
+</script>
+
+</body>
+</html>
